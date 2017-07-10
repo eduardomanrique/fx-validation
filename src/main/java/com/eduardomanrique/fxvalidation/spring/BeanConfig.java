@@ -3,13 +3,20 @@ package com.eduardomanrique.fxvalidation.spring;
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Ticker;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.http.converter.json.SpringHandlerInstantiator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -17,9 +24,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import java.util.Arrays;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@Slf4j
 public class BeanConfig {
 
     @Autowired
@@ -68,4 +78,48 @@ public class BeanConfig {
         return Ticker.systemTicker();
     }
 
+    @Bean
+    public GracefulShutdown gracefulShutdown() {
+        return new GracefulShutdown();
+    }
+
+    @Bean
+    public EmbeddedServletContainerCustomizer tomcatCustomizer() {
+        return container -> {
+            if (container instanceof TomcatEmbeddedServletContainerFactory) {
+                ((TomcatEmbeddedServletContainerFactory) container)
+                        .addConnectorCustomizers(gracefulShutdown());
+            }
+        };
+    }
+
+    private static class GracefulShutdown implements TomcatConnectorCustomizer,
+            ApplicationListener<ContextClosedEvent> {
+
+        private volatile Connector connector;
+
+        @Override
+        public void customize(Connector connector) {
+            this.connector = connector;
+        }
+
+        @Override
+        public void onApplicationEvent(ContextClosedEvent event) {
+            this.connector.pause();
+            Executor executor = this.connector.getProtocolHandler().getExecutor();
+            if (executor instanceof ThreadPoolExecutor) {
+                try {
+                    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+                    threadPoolExecutor.shutdown();
+                    if (!threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+                        log.warn("Tomcat thread pool did not shut down gracefully within "
+                                + "30 seconds. Proceeding with forceful shutdown");
+                    }
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+    }
 }
