@@ -1,11 +1,11 @@
 package com.eduardomanrique.fxvalidation.products.deserializer;
 
-import com.eduardomanrique.fxvalidation.DateUtil;
 import com.eduardomanrique.fxvalidation.entity.Currency;
 import com.eduardomanrique.fxvalidation.entity.Customer;
 import com.eduardomanrique.fxvalidation.products.*;
 import com.eduardomanrique.fxvalidation.service.CurrencyService;
 import com.eduardomanrique.fxvalidation.service.CustomerService;
+import com.eduardomanrique.fxvalidation.util.DateUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -65,9 +65,11 @@ public class FXTransactionDeserializer extends JsonDeserializer<FXTransaction> {
                 vanilla.setPremiumDate(DateUtil.parse(Optional.ofNullable(text(node, "premiumDate"))).orElse(null));
                 vanilla.setPremium(decimal(node, "premium"));
                 String payCcyName = text(node, "payCcy");
-                vanilla.setPayCcy(currencyService.getCurrencyByIsoCode(payCcyName).orElseGet(() -> new Currency(payCcyName)));
+                vanilla.setPayCcy(payCcyName);
+                vanilla.setPayCurrency(currencyService.getCurrencyByIsoCode(payCcyName).orElseGet(() -> new Currency(payCcyName)));
                 String premiumCcyName = text(node, "premiumCcy");
-                vanilla.setPremiumCcy(currencyService.getCurrencyByIsoCode(premiumCcyName).orElseGet(() -> new Currency(premiumCcyName)));
+                vanilla.setPremiumCcy(premiumCcyName);
+                vanilla.setPremiumCurrency(currencyService.getCurrencyByIsoCode(premiumCcyName).orElseGet(() -> new Currency(premiumCcyName)));
                 result = Optional.of(vanilla);
             }
         }
@@ -92,10 +94,12 @@ public class FXTransactionDeserializer extends JsonDeserializer<FXTransaction> {
     private void fillCommonFields(JsonNode node, FXTransaction transaction) {
         String customerName = text(node, "customer");
         Optional<Customer> customer = customerService.getCustomerByName(customerName);
-        transaction.setCustomer(customer.orElseGet(() -> new Customer(customerName)));
+        transaction.setCustomer(customerName);
+        transaction.setCustomerEntity(customer.orElseGet(() -> new Customer(customerName)));
 
         CurrencyPair currencyPair = new CurrencyPair();
         String currencyPairStr = text(node, "ccyPair");
+        transaction.setCcyPair(currencyPairStr);
         String currencyName1 = currencyPairStr.substring(0, 3);
         currencyPair.setCurrency1(
                 currencyService.getCurrencyByIsoCode(currencyName1)

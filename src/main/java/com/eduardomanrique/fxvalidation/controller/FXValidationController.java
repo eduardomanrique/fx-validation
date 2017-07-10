@@ -34,10 +34,10 @@ public class FXValidationController {
     @RequestMapping(value = "/bulk-validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ResponseBody
-    public DeferredResult<List<? extends Validation>> validateTransactions(@RequestBody List<FXTransaction> transaction) {
+    public DeferredResult<List<? extends Validation>> validateTransactions(@RequestBody List<FXTransaction> transactionList) {
 
         DeferredResult<List<? extends Validation>> deferredResult = new DeferredResult<>();
-        validationService.validateTransaction(transaction, deferredResult::setResult, deferredResult::setErrorResult);
+        validationService.validateTransaction(transactionList, deferredResult::setResult, deferredResult::setErrorResult);
 
         return deferredResult;
     }

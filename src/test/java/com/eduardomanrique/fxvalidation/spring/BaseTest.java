@@ -1,4 +1,4 @@
-package com.eduardomanrique.fxvalidation.config;
+package com.eduardomanrique.fxvalidation.spring;
 
 import java.util.TimeZone;
 

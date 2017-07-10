@@ -1,4 +1,4 @@
-package com.eduardomanrique.fxvalidation;
+package com.eduardomanrique.fxvalidation.util;
 
 import lombok.SneakyThrows;
 

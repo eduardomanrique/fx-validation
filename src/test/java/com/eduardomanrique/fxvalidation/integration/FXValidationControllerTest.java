@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.eduardomanrique.fxvalidation.config.IntegrationTest;
+import com.eduardomanrique.fxvalidation.spring.IntegrationTest;
 
 public class FXValidationControllerTest extends IntegrationTest {
 

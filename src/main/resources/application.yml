@@ -8,8 +8,3 @@ spring:
     properties:
       hibernate:
         format_sql: true
-xx:
-  cache:
-    cache-names: instruments
-    caffeine:
-      spec: expireAfterAccess=20s

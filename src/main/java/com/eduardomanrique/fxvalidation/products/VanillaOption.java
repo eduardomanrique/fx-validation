@@ -1,6 +1,7 @@
 package com.eduardomanrique.fxvalidation.products;
 
 import com.eduardomanrique.fxvalidation.entity.Currency;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,9 +12,13 @@ public abstract class VanillaOption extends FXTransaction {
     private String strategy;
     private Date deliveryDate;
     private Date expiryDate;
-    private Currency payCcy;
+    @JsonIgnore
+    private Currency payCurrency;
+    private String payCcy;
     private BigDecimal premium;
-    private Currency premiumCcy;
+    @JsonIgnore
+    private Currency premiumCurrency;
+    private String premiumCcy;
     private String premiumType;
     private Date premiumDate;
 }

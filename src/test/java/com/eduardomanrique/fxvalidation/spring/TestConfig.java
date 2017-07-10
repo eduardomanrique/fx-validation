@@ -1,4 +1,4 @@
-package com.eduardomanrique.fxvalidation.config;
+package com.eduardomanrique.fxvalidation.spring;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.ComponentScan;

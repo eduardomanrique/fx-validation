@@ -2,6 +2,7 @@ package com.eduardomanrique.fxvalidation.products;
 
 import com.eduardomanrique.fxvalidation.entity.Customer;
 import com.eduardomanrique.fxvalidation.products.deserializer.FXTransactionDeserializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
@@ -16,8 +17,12 @@ public abstract class FXTransaction {
         BUY, SELL
     }
 
-    private Customer customer;
+    @JsonIgnore
+    private Customer customerEntity;
+    private String customer;
+    @JsonIgnore
     private CurrencyPair currencyPair;
+    private String ccyPair;
     private Direction direction;
     private Date tradeDate;
     private BigDecimal amount1;

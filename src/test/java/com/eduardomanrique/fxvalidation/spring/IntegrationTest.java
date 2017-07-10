@@ -1,4 +1,4 @@
-package com.eduardomanrique.fxvalidation.config;
+package com.eduardomanrique.fxvalidation.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

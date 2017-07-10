@@ -2,6 +2,7 @@ package com.eduardomanrique.fxvalidation.service;
 
 import com.eduardomanrique.fxvalidation.products.FXTransaction;
 import com.eduardomanrique.fxvalidation.rulesengine.Validation;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 import java.util.Date;
@@ -22,6 +23,7 @@ public interface FXValidationService {
         @Getter
         private final String direction;
         @Getter
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         private final Date tradeDate;
 
         public FXValidationResult(String customerName, String currencyPair, String type, String direction, Date tradeDate) {

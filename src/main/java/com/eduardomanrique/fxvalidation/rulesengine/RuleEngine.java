@@ -22,6 +22,9 @@ public class RuleEngine {
     @PostConstruct
     public final void init() {
         sortedRuleSet.addAll(ruleList);
+        if (sortedRuleSet.size() != ruleList.size()) {
+            throw new RuntimeException("Rules are possibly wrong. There are conflicting priorities");
+        }
     }
 
     public void fireRules(final Object fact, final Validation validation) {

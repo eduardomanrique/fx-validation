@@ -10,11 +10,11 @@ import java.util.List;
 public abstract class Validation {
 
     @Getter
-    private boolean error = false;
+    private boolean valid = true;
     private List<ErrorMessage> errorMessages = new ArrayList<>();
 
     public final void addValidationError(String code, String msg) {
-        error = true;
+        valid = false;
         errorMessages.add(new ErrorMessage(code, msg));
     }
 

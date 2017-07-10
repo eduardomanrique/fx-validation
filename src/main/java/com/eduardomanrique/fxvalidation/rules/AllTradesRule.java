@@ -1,12 +1,14 @@
 package com.eduardomanrique.fxvalidation.rules;
 
-import com.eduardomanrique.fxvalidation.DateUtil;
 import com.eduardomanrique.fxvalidation.products.FXTransaction;
 import com.eduardomanrique.fxvalidation.products.Forward;
 import com.eduardomanrique.fxvalidation.products.Spot;
 import com.eduardomanrique.fxvalidation.rulesengine.Rule;
 import com.eduardomanrique.fxvalidation.rulesengine.Validation;
+import com.eduardomanrique.fxvalidation.service.FixerIOApiGatewayService;
+import com.eduardomanrique.fxvalidation.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -15,23 +17,8 @@ import java.util.Date;
 @Slf4j
 public class AllTradesRule implements Rule<FXTransaction> {
 
-    public enum Errors {
-        EmptyTradeDate("Trade date is null"),
-        EmptyVaueDate("Value date is null"),
-        ValueDateBeforeTradeDate("Value date %s before trade date %s"),
-        InvalidCustomer("Customer %s is not valid"),
-        InvalidCurrency("Currency %s is not valid");
-
-        private final String msg;
-
-        Errors(String msg) {
-            this.msg = msg;
-        }
-
-        public String msg(Object... parameters) {
-            return String.format(this.msg, parameters);
-        }
-    }
+    @Autowired
+    private FixerIOApiGatewayService fixerIOApiGatewayService;
 
     @Override
     public int getPriotiy() {
@@ -48,9 +35,9 @@ public class AllTradesRule implements Rule<FXTransaction> {
         if (fact instanceof Spot || fact instanceof Forward) {
             checkValueDate(fact, validation);
         }
-        if (fact.getCustomer().getId() == null) {
+        if (fact.getCustomerEntity().getId() == null) {
             validation.addValidationError(Errors.InvalidCustomer.name(),
-                    Errors.InvalidCustomer.msg(fact.getCustomer().getName()));
+                    Errors.InvalidCustomer.msg(fact.getCustomer()));
         }
         if (fact.getCurrencyPair().getCurrency1().getName() == null) {
             validation.addValidationError(Errors.InvalidCurrency.name(),
@@ -70,15 +57,22 @@ public class AllTradesRule implements Rule<FXTransaction> {
             valueDate = ((Forward) fact).getValueDate();
         }
         if (valueDate == null) {
-            validation.addValidationError(Errors.EmptyVaueDate.name(),
-                    Errors.EmptyVaueDate.msg());
+            validation.addValidationError(Errors.EmptyValueDate.name(),
+                    Errors.EmptyValueDate.msg());
+        } else {
+            if (valueDate.before(fact.getTradeDate())) {
+                validation.addValidationError(
+                        Errors.ValueDateBeforeTradeDate.name(),
+                        Errors.ValueDateBeforeTradeDate.msg(
+                                DateUtil.format(valueDate), DateUtil.format(fact.getTradeDate())));
+
+            }
+            if (!fixerIOApiGatewayService.isBusinessDay(valueDate)) {
+                validation.addValidationError(
+                        Errors.ValueDateNotBusinessDate.name(),
+                        Errors.ValueDateNotBusinessDate.msg(
+                                DateUtil.format(valueDate), DateUtil.format(valueDate)));
+            }
         }
-        if (valueDate.before(fact.getTradeDate())) {
-            validation.addValidationError(
-                    Errors.ValueDateBeforeTradeDate.name(),
-                    Errors.ValueDateBeforeTradeDate.msg(
-                            DateUtil.format(valueDate), DateUtil.format(fact.getTradeDate())));
-        }
-        //TODO check fixio
     }
 }

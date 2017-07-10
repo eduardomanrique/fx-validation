@@ -41,7 +41,7 @@ public class FXValidationServiceImpl implements FXValidationService {
         return CompletableFuture.supplyAsync(() -> {
 
             FXValidationResult validationResult = new FXValidationResult(
-                    transaction.getCustomer().getName(),
+                    transaction.getCustomer(),
                     transaction.getCurrencyPair().getCurrency1().getIsoCode() +
                             transaction.getCurrencyPair().getCurrency2().getIsoCode(),
                     transaction.getClass().getSimpleName(),
