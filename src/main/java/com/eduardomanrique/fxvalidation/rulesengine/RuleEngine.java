@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.ParameterizedType;
+import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -14,20 +15,18 @@ import java.util.TreeSet;
 @Slf4j
 public class RuleEngine {
 
+    private SortedSet<Rule> sortedRuleSet;
+
     @Autowired
-    private List<Rule> ruleList;
-
-    private SortedSet<Rule> sortedRuleSet = new TreeSet<>((o1, o2) -> Integer.compare(o1.getPriotiy(), o2.getPriotiy()));
-
-    @PostConstruct
-    public final void init() {
+    public RuleEngine(List<Rule> ruleList) {
+        sortedRuleSet = new TreeSet<>(Comparator.comparing(Rule::getPriotiy));
         sortedRuleSet.addAll(ruleList);
         if (sortedRuleSet.size() != ruleList.size()) {
             throw new RuntimeException("Rules are possibly wrong. There are conflicting priorities");
         }
     }
 
-    public void fireRules(final Object fact, final Validation validation) {
+    public final void fireRules(final Object fact, final Validation validation) {
         sortedRuleSet.stream()
                 .filter(rule -> filterByParameterType(rule, fact))
                 .forEach(rule -> rule.onFact(fact, validation));

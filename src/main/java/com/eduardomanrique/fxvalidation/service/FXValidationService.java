@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public interface FXValidationService {
-    void validateTransaction(List<FXTransaction> transactionList, Consumer<List<FXValidationResult>> callback, Consumer<Throwable> onError);
+    List<FXValidationResult> validateTransaction(List<FXTransaction> transactionList);
 
     class FXValidationResult extends Validation {
 

@@ -3,11 +3,13 @@ package com.eduardomanrique.fxvalidation.products;
 import com.eduardomanrique.fxvalidation.entity.Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class VanillaOption extends FXTransaction {
     private String strategy;
     private Date deliveryDate;

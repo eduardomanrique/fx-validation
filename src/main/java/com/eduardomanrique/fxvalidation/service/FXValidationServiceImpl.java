@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,19 +20,11 @@ public class FXValidationServiceImpl implements FXValidationService {
     private int processors = Runtime.getRuntime().availableProcessors();
 
     @Override
-    public void validateTransaction(List<FXTransaction> transactionList, Consumer<List<FXValidationResult>> callback, Consumer<Throwable> onError) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                callback.accept(new ForkJoinPool(processors).submit(() ->
-                        transactionList.parallelStream()
-                                .map(this::execRules)
-                                .map(CompletableFuture::join)
-                                .collect(Collectors.toList())
-                ).get());
-            } catch (Throwable t) {
-                onError.accept(t);
-            }
-        });
+    public List<FXValidationResult> validateTransaction(List<FXTransaction> transactionList) {
+        return transactionList.parallelStream()
+                .map(this::execRules)
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
     }
 
     private CompletableFuture<FXValidationResult> execRules(FXTransaction transaction) {

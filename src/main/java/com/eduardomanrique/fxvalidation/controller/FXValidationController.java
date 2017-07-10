@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,23 +21,16 @@ public class FXValidationController {
     @RequestMapping(value = "/validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ResponseBody
-    public DeferredResult<Validation> validateTransaction(@RequestBody FXTransaction transaction) {
+    public Validation validateTransaction(@RequestBody FXTransaction transaction) {
 
-        DeferredResult<Validation> deferredResult = new DeferredResult<>();
-        validationService.validateTransaction(Collections.singletonList(transaction),
-                list -> deferredResult.setResult(list.get(0)), deferredResult::setErrorResult);
-
-        return deferredResult;
+        return validationService.validateTransaction(Collections.singletonList(transaction)).get(0);
     }
 
     @RequestMapping(value = "/bulk-validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ResponseBody
-    public DeferredResult<List<? extends Validation>> validateTransactions(@RequestBody List<FXTransaction> transactionList) {
+    public List<? extends Validation> validateTransactions(@RequestBody List<FXTransaction> transactionList) {
 
-        DeferredResult<List<? extends Validation>> deferredResult = new DeferredResult<>();
-        validationService.validateTransaction(transactionList, deferredResult::setResult, deferredResult::setErrorResult);
-
-        return deferredResult;
+        return validationService.validateTransaction(transactionList);
     }
 }

@@ -5,11 +5,13 @@ import com.eduardomanrique.fxvalidation.products.deserializer.FXTransactionDeser
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
+@EqualsAndHashCode
 @JsonDeserialize(using = FXTransactionDeserializer.class)
 public abstract class FXTransaction {
 

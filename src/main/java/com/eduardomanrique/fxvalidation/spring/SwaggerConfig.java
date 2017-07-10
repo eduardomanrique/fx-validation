@@ -3,7 +3,6 @@ package com.eduardomanrique.fxvalidation.spring;
 import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -21,7 +20,6 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.any())
                 .paths(Predicates.not(PathSelectors.regex("/error")))
                 .build()
-                .pathMapping("/")
-                .genericModelSubstitutes(DeferredResult.class);
+                .pathMapping("/");
     }
 }
