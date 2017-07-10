@@ -12,17 +12,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
+@ActiveProfiles("test_rules")
 public class RulesTest {
 
     @Autowired
@@ -49,8 +52,6 @@ public class RulesTest {
         spot.setTradeDate(cal.getTime());
 
         spot.getCustomerEntity().setId(1l);
-        spot.getCurrencyPair().getCurrency1().setName("cc1");
-        spot.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(spot, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -69,8 +70,6 @@ public class RulesTest {
         spot.setTradeDate(cal.getTime());
 
         spot.getCustomerEntity().setId(1l);
-        spot.getCurrencyPair().getCurrency1().setName("cc1");
-        spot.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(spot, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -81,7 +80,10 @@ public class RulesTest {
     public void testTrade() {
         Validation validation = new Validation() {
         };
-        ruleEngine.fireRules(fillObjects(new Spot()), validation);
+        Spot spot = fillObjects(new Spot());
+        spot.getCurrencyPair().setCurrency1(Optional.empty());
+        spot.getCurrencyPair().setCurrency2(Optional.empty());
+        ruleEngine.fireRules(spot, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
         Assert.assertTrue("Should have 5 messages", messages.size() == 5);
         Assert.assertTrue("EmptyTradeDate", messages.get(0).getCode().equals("EmptyTradeDate"));
@@ -100,8 +102,6 @@ public class RulesTest {
         spot.setTradeDate(new Date());
         spot.setValueDate(new Date());
         spot.getCustomerEntity().setId(1l);
-        spot.getCurrencyPair().getCurrency1().setName("cc1");
-        spot.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(spot, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -118,8 +118,6 @@ public class RulesTest {
         spot.setTradeDate(new Date());
         spot.setValueDate(new Date());
         spot.getCustomerEntity().setId(1l);
-        spot.getCurrencyPair().getCurrency1().setName("cc1");
-        spot.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(spot, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -130,12 +128,10 @@ public class RulesTest {
     public void testInvalidForwardDate() {
         Validation validation = new Validation() {
         };
-        Forward forward = (Forward) fillObjects(new Forward());
+        Forward forward = fillObjects(new Forward());
         forward.setTradeDate(new Date());
         forward.setValueDate(new Date());
         forward.getCustomerEntity().setId(1l);
-        forward.getCurrencyPair().getCurrency1().setName("cc1");
-        forward.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(forward, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -149,12 +145,10 @@ public class RulesTest {
         when(fixerIOApiGatewayService.businessDaysBetween(any(), any())).thenReturn(3);
         Validation validation = new Validation() {
         };
-        Forward forward = (Forward) fillObjects(new Forward());
+        Forward forward = fillObjects(new Forward());
         forward.setTradeDate(new Date());
         forward.setValueDate(new Date());
         forward.getCustomerEntity().setId(1l);
-        forward.getCurrencyPair().getCurrency1().setName("cc1");
-        forward.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(forward, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -165,11 +159,9 @@ public class RulesTest {
     public void testInvalidOption() {
         Validation validation = new Validation() {
         };
-        VanillaOption option = (VanillaOption) fillObjects(new EuropeanVanillaOption());
+        VanillaOption option = fillObjects(new EuropeanVanillaOption());
         option.setTradeDate(new Date());
         option.getCustomerEntity().setId(1l);
-        option.getCurrencyPair().getCurrency1().setName("cc1");
-        option.getCurrencyPair().getCurrency2().setName("cc2");
 
         ruleEngine.fireRules(option, validation);
         List<Validation.ErrorMessage> messages = validation.getErrorMessages();
@@ -183,11 +175,9 @@ public class RulesTest {
     public void testInvalidOptionDates() {
         Validation validation = new Validation() {
         };
-        VanillaOption option = (VanillaOption) fillObjects(new EuropeanVanillaOption());
+        VanillaOption option = fillObjects(new EuropeanVanillaOption());
         option.setTradeDate(new Date());
         option.getCustomerEntity().setId(1l);
-        option.getCurrencyPair().getCurrency1().setName("cc1");
-        option.getCurrencyPair().getCurrency2().setName("cc2");
         Calendar cal = Calendar.getInstance();
         option.setDeliveryDate(cal.getTime());
         cal.add(Calendar.DATE, 10);
@@ -205,11 +195,9 @@ public class RulesTest {
     public void testValidOptions() {
         Validation validation = new Validation() {
         };
-        VanillaOption option = (VanillaOption) fillObjects(new EuropeanVanillaOption());
+        VanillaOption option = fillObjects(new EuropeanVanillaOption());
         option.setTradeDate(new Date());
         option.getCustomerEntity().setId(1l);
-        option.getCurrencyPair().getCurrency1().setName("cc1");
-        option.getCurrencyPair().getCurrency2().setName("cc2");
 
         Calendar cal = Calendar.getInstance();
         option.setDeliveryDate(cal.getTime());
@@ -225,11 +213,9 @@ public class RulesTest {
     public void testInvalidAmericanOption() {
         Validation validation = new Validation() {
         };
-        VanillaOption option = (VanillaOption) fillObjects(new AmericanVanillaOption());
+        VanillaOption option = fillObjects(new AmericanVanillaOption());
         option.setTradeDate(new Date());
         option.getCustomerEntity().setId(1l);
-        option.getCurrencyPair().getCurrency1().setName("cc1");
-        option.getCurrencyPair().getCurrency2().setName("cc2");
 
         Calendar cal = Calendar.getInstance();
         option.setDeliveryDate(cal.getTime());
@@ -248,11 +234,9 @@ public class RulesTest {
     public void testInvalidAmericanOptionExerciseStartDate() {
         Validation validation = new Validation() {
         };
-        AmericanVanillaOption option = (AmericanVanillaOption) fillObjects(new AmericanVanillaOption());
+        AmericanVanillaOption option = fillObjects(new AmericanVanillaOption());
         option.setTradeDate(new Date());
         option.getCustomerEntity().setId(1l);
-        option.getCurrencyPair().getCurrency1().setName("cc1");
-        option.getCurrencyPair().getCurrency2().setName("cc2");
 
         Calendar cal = Calendar.getInstance();
         option.setDeliveryDate(cal.getTime());
@@ -273,11 +257,9 @@ public class RulesTest {
     public void testValidAmericanOptionExerciseStartDate() {
         Validation validation = new Validation() {
         };
-        AmericanVanillaOption option = (AmericanVanillaOption) fillObjects(new AmericanVanillaOption());
+        AmericanVanillaOption option = fillObjects(new AmericanVanillaOption());
         option.setTradeDate(new Date());
         option.getCustomerEntity().setId(1l);
-        option.getCurrencyPair().getCurrency1().setName("cc1");
-        option.getCurrencyPair().getCurrency2().setName("cc2");
 
         Calendar cal = Calendar.getInstance();
         option.setDeliveryDate(cal.getTime());
@@ -292,12 +274,16 @@ public class RulesTest {
     }
 
 
-    private FXTransaction fillObjects(FXTransaction transaction) {
+    private <T> T fillObjects(FXTransaction transaction) {
         transaction.setCustomerEntity(new Customer());
         CurrencyPair currencyPair = new CurrencyPair();
-        currencyPair.setCurrency1(new Currency());
-        currencyPair.setCurrency2(new Currency());
+        Currency currency = new Currency();
+        currency.setName("ccy1");
+        currencyPair.setCurrency1(Optional.of(currency));
+        currency = new Currency();
+        currency.setName("ccy2");
+        currencyPair.setCurrency2(Optional.of(currency));
         transaction.setCurrencyPair(currencyPair);
-        return transaction;
+        return (T) transaction;
     }
 }

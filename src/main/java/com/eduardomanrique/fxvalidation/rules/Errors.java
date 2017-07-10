@@ -5,7 +5,7 @@ public enum Errors {
     EmptyValueDate("Value date is null"),
     ValueDateBeforeTradeDate("Value date %s before trade date %s"),
     InvalidCustomer("Customer %s is not valid"),
-    InvalidCurrency("Currency %s is not valid"),
+    InvalidCurrency("Currency is not valid"),
     ValueDateNotBusinessDate("Value date must be a business day"),
 
     ExpiryOrPremiumDateAfterDelivery("Expiry date (%s) and premium date (%s) shall be before delivery date (%s)"),

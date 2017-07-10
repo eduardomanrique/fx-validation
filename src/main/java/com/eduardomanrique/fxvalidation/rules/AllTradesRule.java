@@ -29,23 +29,19 @@ public class AllTradesRule implements Rule<FXTransaction> {
     public void onFact(FXTransaction fact, Validation validation) {
         log.debug("Rule for all trades: {}", fact);
         if (fact.getTradeDate() == null) {
-            validation.addValidationError(Errors.EmptyTradeDate.name(),
-                    Errors.EmptyTradeDate.msg());
+            validation.addValidationError(Errors.EmptyTradeDate.name(), Errors.EmptyTradeDate.msg());
         }
         if (fact instanceof Spot || fact instanceof Forward) {
             checkValueDate(fact, validation);
         }
         if (fact.getCustomerEntity().getId() == null) {
-            validation.addValidationError(Errors.InvalidCustomer.name(),
-                    Errors.InvalidCustomer.msg(fact.getCustomer()));
+            validation.addValidationError(Errors.InvalidCustomer.name(), Errors.InvalidCustomer.msg(fact.getCustomer()));
         }
-        if (fact.getCurrencyPair().getCurrency1().getName() == null) {
-            validation.addValidationError(Errors.InvalidCurrency.name(),
-                    Errors.InvalidCurrency.msg(fact.getCurrencyPair().getCurrency1().getIsoCode()));
+        if (!fact.getCurrencyPair().getCurrency1().isPresent()) {
+            validation.addValidationError(Errors.InvalidCurrency.name(), Errors.InvalidCurrency.msg());
         }
-        if (fact.getCurrencyPair().getCurrency2().getName() == null) {
-            validation.addValidationError(Errors.InvalidCurrency.name(),
-                    Errors.InvalidCurrency.msg(fact.getCurrencyPair().getCurrency2().getIsoCode()));
+        if (!fact.getCurrencyPair().getCurrency2().isPresent()) {
+            validation.addValidationError(Errors.InvalidCurrency.name(), Errors.InvalidCurrency.msg());
         }
     }
 

@@ -100,16 +100,15 @@ public class FXTransactionDeserializer extends JsonDeserializer<FXTransaction> {
         CurrencyPair currencyPair = new CurrencyPair();
         String currencyPairStr = text(node, "ccyPair");
         transaction.setCcyPair(currencyPairStr);
-        String currencyName1 = currencyPairStr.substring(0, 3);
-        currencyPair.setCurrency1(
-                currencyService.getCurrencyByIsoCode(currencyName1)
-                        .orElseGet(() -> new Currency(currencyName1))
-        );
-        String currencyName2 = currencyPairStr.substring(3);
-        currencyPair.setCurrency2(
-                currencyService.getCurrencyByIsoCode(currencyName2)
-                        .orElseGet(() -> new Currency(currencyName2))
-        );
+        if (currencyPairStr != null && currencyPairStr.length() > 3) {
+            String currencyName1 = currencyPairStr.substring(0, 3);
+            currencyPair.setCurrency1(currencyService.getCurrencyByIsoCode(currencyName1));
+            String currencyName2 = currencyPairStr.substring(3);
+            currencyPair.setCurrency2(currencyService.getCurrencyByIsoCode(currencyName2));
+        } else {
+            currencyPair.setCurrency1(Optional.empty());
+            currencyPair.setCurrency2(Optional.empty());
+        }
         transaction.setCurrencyPair(currencyPair);
         transaction.setDirection(FXTransaction.Direction.valueOf(text(node, "direction").toUpperCase()));
         transaction.setTradeDate(DateUtil.parse(Optional.ofNullable(text(node, "tradeDate"))).orElse(null));

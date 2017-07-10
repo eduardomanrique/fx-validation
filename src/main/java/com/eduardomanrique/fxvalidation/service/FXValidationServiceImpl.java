@@ -1,5 +1,6 @@
 package com.eduardomanrique.fxvalidation.service;
 
+import com.eduardomanrique.fxvalidation.entity.Currency;
 import com.eduardomanrique.fxvalidation.products.FXTransaction;
 import com.eduardomanrique.fxvalidation.rulesengine.RuleEngine;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,8 @@ public class FXValidationServiceImpl implements FXValidationService {
 
             FXValidationResult validationResult = new FXValidationResult(
                     transaction.getCustomer(),
-                    transaction.getCurrencyPair().getCurrency1().getIsoCode() +
-                            transaction.getCurrencyPair().getCurrency2().getIsoCode(),
+                    transaction.getCurrencyPair().getCurrency1().map(Currency::getIsoCode).orElse(null) +
+                            transaction.getCurrencyPair().getCurrency2().map(Currency::getIsoCode).orElse(null),
                     transaction.getClass().getSimpleName(),
                     transaction.getDirection().name(),
                     transaction.getTradeDate());

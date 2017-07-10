@@ -31,8 +31,10 @@ public class BeanConfig {
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
         EmbeddedDatabase db = builder
                 .setType(EmbeddedDatabaseType.DERBY)
+                .addScript("sql/drop-tables.sql")
                 .addScript("sql/create-db.sql")
                 .addScript("sql/insert-data.sql")
+                .ignoreFailedDrops(true)
                 .build();
         return new JdbcTemplate(db);
     }
