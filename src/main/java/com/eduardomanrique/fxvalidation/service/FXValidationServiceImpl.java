@@ -3,6 +3,7 @@ package com.eduardomanrique.fxvalidation.service;
 import com.eduardomanrique.fxvalidation.entity.Currency;
 import com.eduardomanrique.fxvalidation.products.FXTransaction;
 import com.eduardomanrique.fxvalidation.rulesengine.RuleEngine;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,18 @@ public class FXValidationServiceImpl implements FXValidationService {
     @Autowired
     private RuleEngine ruleEngine;
 
-    private int processors = Runtime.getRuntime().availableProcessors();
+    @Getter
+    private Metrics metrics = new Metrics();
 
     @Override
     public List<FXValidationResult> validateTransaction(List<FXTransaction> transactionList) {
-        return transactionList.parallelStream()
+        long init = System.currentTimeMillis();
+        List<FXValidationResult> result = transactionList.parallelStream()
                 .map(this::execRules)
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
+        metrics.addTime(System.currentTimeMillis() - init);
+        return result;
     }
 
     private CompletableFuture<FXValidationResult> execRules(FXTransaction transaction) {
@@ -43,4 +48,6 @@ public class FXValidationServiceImpl implements FXValidationService {
             return validationResult;
         });
     }
+
+
 }

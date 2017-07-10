@@ -1,6 +1,15 @@
 # fx-validation
 Simple spring boot rest app for fx-validation
 
+## About the project
+
+  The project was built using Spring(Boot, MVC, Repository, Cache), JPA and lombok. The JPA is used in 
+conjunction with spring repositories and spring services with a derby embedded db. The spring service 
+has some cacheable operations. Some of the operations have an eternal cache, and some others a less 
+durable cache. The cache configuration is at BeanConfig class. 
+  Because we call an external system (fixer.io) to get the business dates, the first time we call
+the operations are slower. After some time, it will be fast as the business dates are cached forever.
+
 ## Architectural decisions
 The web application was build to be a shared nothing style, totally stateless. This allows to 
 scale the application just by adding more machines to the cluster. For this, it is needed a
@@ -16,6 +25,10 @@ The application uses swagger to document the rest API. It is accesible on:
 
 Also on this page, it is possible to execute the api.
 
+## Metris
+To access the metrics page go to:
+-http://localhost:8080/metrics
+
 ## Prerequisites
 Gradle, java8
 
@@ -28,13 +41,7 @@ Gradle, java8
 -To run the project, on a terminal go the root folder of the project, and run: 
 
 ./gradlew bootRun
- 
-## About the project
 
-  The project was built using Spring(Boot, MVC, Repository, Cache), JPA and lombok. The JPA is used in 
-conjunction with spring repositories and spring services with a derby embedded db. The spring service 
-has some cacheable operations. Some of the operations have an eternal cache, and some others a less 
-durable cache. The cache configuration is at BeanConfig class.
 
 ### The rule engine
   On the package com.eduardomanrique.fxvalidation.ruleengine we have the classes responsible for the
@@ -57,7 +64,7 @@ rule engine framework. The framework is a very simple engine to execute Rules in
   -EuropeanVanillaOption: VanillaOption of style Europe, child of VanillaOption
   -AmericaVanillaOption: VanillaOption of style American, child of VanillaOption
   
-### Rule
+### Rules
   To create new rules just implement the interface com.eduardomanrique.fxvalidation.ruleengine.Rule and 
 annotate it with @Component from spring. Spring will automatically add the rule to the rule engine. 
   There are 5 implemented rules. They are located in the package "com.eduardomanrique.fxvalidation.rules":
